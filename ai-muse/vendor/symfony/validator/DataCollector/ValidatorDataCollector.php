@@ -12,8 +12,8 @@
 namespace AIMuseVendor\Symfony\Component\Validator\DataCollector;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use AIMuseVendor\Symfony\Component\HttpFoundation\Request;
+use AIMuseVendor\Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use AIMuseVendor\Symfony\Component\Validator\Validator\TraceableValidator;
@@ -40,7 +40,7 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         // Everything is collected once, on kernel terminate.
     }

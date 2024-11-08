@@ -2,14 +2,12 @@
 
 namespace AIMuse\Helpers;
 
+use AIMuse\Exceptions\ControllerException;
 use AIMuse\Models\AIModel;
 
 class PremiumHelper
 {
-  public static array $premiumServices = [
-    'googleai',
-    'openrouter',
-  ];
+  public static array $premiumServices = [];
 
   public static array $freePostTypes = [
     'post',
@@ -38,9 +36,22 @@ class PremiumHelper
     $freemius = aimuse()->freemius();
     $premium = array(
       'is_free' => $freemius->is_free_plan(),
-      'is_white_labeled' => $freemius->is_whitelabeled(),
     );
 
     return $premium;
+  }
+
+  public static function validateModel(AIModel $model)
+  {
+    self::validateService($model->service);
+  }
+
+  public static function validateService(string $service)
+  {
+    if (!PremiumHelper::isPremium()) {
+      if (in_array($service, self::$premiumServices)) {
+        throw ControllerException::make("You need to upgrade to premium to use {$service} service", 400);
+      }
+    }
   }
 }

@@ -18,10 +18,13 @@ class GenerateTextValidator implements Validator
           new Assert\Type('array'),
         ]),
         'prompt' => new Assert\Optional(),
-        'channel' => [
+        'forceSSE' => new Assert\Optional([
+          new Assert\Type('boolean'),
+        ]),
+        'channel' => new Assert\Optional([
           new Assert\NotBlank(),
           new Assert\Type('string'),
-        ],
+        ]),
         'component' => new Assert\Type('string'),
         'post' => new Assert\Optional([
           new Assert\Type('integer'),

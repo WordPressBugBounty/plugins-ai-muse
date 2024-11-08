@@ -7,8 +7,8 @@ use Illuminate\Foundation\Bus\PendingChain;
 use AIMuseVendor\Illuminate\Support\Testing\Fakes\BusFake;
 
 /**
- * @method static \Illuminate\Bus\Batch|null findBatch(string $batchId)
- * @method static \Illuminate\Bus\PendingBatch batch(array|mixed $jobs)
+ * @method static \AIMuseVendor\Illuminate\Bus\Batch|null findBatch(string $batchId)
+ * @method static \AIMuseVendor\Illuminate\Bus\PendingBatch batch(array|mixed $jobs)
  * @method static \AIMuseVendor\Illuminate\Contracts\Bus\Dispatcher map(array $map)
  * @method static \AIMuseVendor\Illuminate\Contracts\Bus\Dispatcher pipeThrough(array $pipes)
  * @method static \Illuminate\Foundation\Bus\PendingChain chain(array $jobs)

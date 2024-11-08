@@ -14,7 +14,7 @@ namespace AIMuseVendor\Monolog\Processor;
 /**
  * Injects memory_get_usage in all records
  *
- * @see AIMuseVendor\Monolog\Processor\MemoryProcessor::__construct() for options
+ * @see Monolog\Processor\MemoryProcessor::__construct() for options
  * @author Rob Jensen
  */
 class MemoryUsageProcessor extends MemoryProcessor

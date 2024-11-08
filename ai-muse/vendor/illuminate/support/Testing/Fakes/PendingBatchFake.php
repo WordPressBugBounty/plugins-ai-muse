@@ -2,7 +2,7 @@
 
 namespace AIMuseVendor\Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Bus\PendingBatch;
+use AIMuseVendor\Illuminate\Bus\PendingBatch;
 use AIMuseVendor\Illuminate\Support\Collection;
 
 class PendingBatchFake extends PendingBatch
@@ -30,7 +30,7 @@ class PendingBatchFake extends PendingBatch
     /**
      * Dispatch the batch.
      *
-     * @return \Illuminate\Bus\Batch
+     * @return \AIMuseVendor\Illuminate\Bus\Batch
      */
     public function dispatch()
     {

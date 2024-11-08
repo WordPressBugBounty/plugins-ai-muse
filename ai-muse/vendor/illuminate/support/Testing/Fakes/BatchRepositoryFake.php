@@ -4,10 +4,10 @@ namespace AIMuseVendor\Illuminate\Support\Testing\Fakes;
 
 use AIMuseVendor\Carbon\CarbonImmutable;
 use Closure;
-use Illuminate\Bus\Batch;
-use Illuminate\Bus\BatchRepository;
-use Illuminate\Bus\PendingBatch;
-use Illuminate\Bus\UpdatedBatchJobCounts;
+use AIMuseVendor\Illuminate\Bus\Batch;
+use AIMuseVendor\Illuminate\Bus\BatchRepository;
+use AIMuseVendor\Illuminate\Bus\PendingBatch;
+use AIMuseVendor\Illuminate\Bus\UpdatedBatchJobCounts;
 use AIMuseVendor\Illuminate\Support\Facades\Facade;
 use AIMuseVendor\Illuminate\Support\Str;
 
@@ -18,7 +18,7 @@ class BatchRepositoryFake implements BatchRepository
      *
      * @param  int  $limit
      * @param  mixed  $before
-     * @return \Illuminate\Bus\Batch[]
+     * @return \AIMuseVendor\Illuminate\Bus\Batch[]
      */
     public function get($limit, $before)
     {
@@ -29,7 +29,7 @@ class BatchRepositoryFake implements BatchRepository
      * Retrieve information about an existing batch.
      *
      * @param  string  $batchId
-     * @return \Illuminate\Bus\Batch|null
+     * @return \AIMuseVendor\Illuminate\Bus\Batch|null
      */
     public function find(string $batchId)
     {
@@ -39,8 +39,8 @@ class BatchRepositoryFake implements BatchRepository
     /**
      * Store a new pending batch.
      *
-     * @param  \Illuminate\Bus\PendingBatch  $batch
-     * @return \Illuminate\Bus\Batch
+     * @param  \AIMuseVendor\Illuminate\Bus\PendingBatch  $batch
+     * @return \AIMuseVendor\Illuminate\Bus\Batch
      */
     public function store(PendingBatch $batch)
     {
@@ -77,7 +77,7 @@ class BatchRepositoryFake implements BatchRepository
      *
      * @param  string  $batchId
      * @param  string  $jobId
-     * @return \Illuminate\Bus\UpdatedBatchJobCounts
+     * @return \AIMuseVendor\Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function decrementPendingJobs(string $batchId, string $jobId)
     {
@@ -89,7 +89,7 @@ class BatchRepositoryFake implements BatchRepository
      *
      * @param  string  $batchId
      * @param  string  $jobId
-     * @return \Illuminate\Bus\UpdatedBatchJobCounts
+     * @return \AIMuseVendor\Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function incrementFailedJobs(string $batchId, string $jobId)
     {

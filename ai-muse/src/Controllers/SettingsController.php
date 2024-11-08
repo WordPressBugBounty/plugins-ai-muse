@@ -38,7 +38,7 @@ class SettingsController extends Controller
   /**
    * @Route(path="/admin/settings", method="POST")
    */
-  public function post(Request $request)
+  public function update(Request $request)
   {
     $violations = $request->validate(SettingsValidator::class);
 
@@ -53,7 +53,7 @@ class SettingsController extends Controller
       $settings = array_diff_key($settings, array_flip($premiumApiKeyNames));
 
       if (isset($settings['textModel'])) {
-        $model = AIModel::find($settings['textModel']);
+        $model = AIModel::query()->find($settings['textModel']);
 
         if (!$model) {
           throw new ControllerException([
@@ -81,83 +81,5 @@ class SettingsController extends Controller
       "status" => "success",
       "message" => "Settings saved successfully",
     ];
-  }
-
-  private function getSecretKey()
-  {
-    return substr(hash('sha256', 'wp-aimuse-backup'), 0, 16);
-  }
-
-  /**
-   * @Route(path="/admin/settings/export", method="GET")
-   */
-  public function export()
-  {
-    $this->checkOpenSSL();
-
-    $backup = [
-      'settings' => Settings::export(),
-      'models' => AIModel::export(),
-      'templates' => Template::export(),
-    ];
-
-    $file = wp_json_encode($backup);
-    $key = $this->getSecretKey();
-    $file = openssl_encrypt($file, 'aes-128-cbc', $key, 0, $key);
-
-    return new WP_REST_Response([
-      'message' => 'Backup created successfully',
-      'file' => $file,
-    ], 200);
-  }
-
-  /**
-   * @Route(path="/admin/settings/import", method="POST")
-   */
-  public function import(Request $request)
-  {
-    $this->checkOpenSSL();
-
-    $file = $request->json('file');
-    $key = $this->getSecretKey();
-    $file = openssl_decrypt($file, 'aes-128-cbc', $key, 0, $key);
-
-    if (!$file) {
-      throw new ControllerException([
-        [
-          'message' => 'Invalid backup file',
-        ]
-      ], 400);
-    }
-
-    $backup = json_decode($file, true);
-
-    if (isset($backup['settings'])) {
-      Settings::import($backup['settings']);
-    }
-
-    if (isset($backup['models'])) {
-      AIModel::import($backup['models']);
-    }
-
-    if (isset($backup['templates'])) {
-      Template::import($backup['templates']);
-    }
-
-    return new WP_REST_Response([
-      'message' => 'Settings restored successfully',
-      'success' => true,
-    ], 200);
-  }
-
-  public function checkOpenSSL()
-  {
-    if (!function_exists('openssl_encrypt')) {
-      throw new ControllerException([
-        [
-          'message' => 'OpenSSL extension is not enabled',
-        ]
-      ], 400);
-    }
   }
 }

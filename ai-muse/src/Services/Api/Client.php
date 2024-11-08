@@ -3,10 +3,8 @@
 namespace AIMuse\Services\Api;
 
 use AIMuse\Models\Settings;
-use AIMuse\Helpers\PricingHelper;
 use AIMuseVendor\Illuminate\Support\Facades\Log;
 use AIMuseVendor\GuzzleHttp\Client as GuzzleClient;
-use AIMuseVendor\GuzzleHttp\Exception\ClientException;
 
 class Client
 {
@@ -24,16 +22,6 @@ class Client
     ];
     $this->client = new GuzzleClient($config);
     $this->token = Settings::get('apiToken', '');
-  }
-
-  public function stream(string $token = null)
-  {
-    if ($token) {
-      return new Stream($token);
-    }
-
-    $this->prepareToken();
-    return new Stream($this->token);
   }
 
   public function setToken(string $token)

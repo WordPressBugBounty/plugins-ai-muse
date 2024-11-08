@@ -4,6 +4,7 @@ namespace AIMuse;
 
 use AIMuse\Exceptions\PatchException;
 use AIMuse\Patches\Patch;
+use AIMuseVendor\Illuminate\Support\Facades\Log;
 
 class Patches
 {
@@ -12,11 +13,12 @@ class Patches
     $patches = self::list();
 
     foreach ($patches as $patch) {
-      if ($patch->applied()) {
-        continue;
+      $patchClass = get_class($patch);
+      Log::debug("Checking if patch $patchClass should be applied");
+      if ($patch->shouldApply()) {
+        Log::info("Applying patch $patchClass");
+        $patch->apply();
       }
-
-      $patch->apply();
     }
   }
 
@@ -66,8 +68,13 @@ class Patches
       $patch = new $patch();
     }
 
+    /**
+     * @var Patch[] $patches
+     */
     usort($patches, function ($a, $b) {
-      return version_compare($a->version, $b->version, '>');
+      $isBigger = version_compare($a->version, $b->version, '>');
+
+      return $isBigger ? 1 : -1;
     });
 
     return $patches;

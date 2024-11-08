@@ -27,7 +27,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use AIMuseVendor\Psr\Http\Message\StreamInterface;
 use AIMuseVendor\Psr\Http\Message\UriInterface;
 use RuntimeException;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use AIMuseVendor\Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * @mixin \League\Flysystem\FilesystemInterface
@@ -179,7 +179,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string|null  $name
      * @param  array|null  $headers
      * @param  string|null  $disposition
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \AIMuseVendor\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function response($path, $name = null, array $headers = [], $disposition = 'inline')
     {
@@ -212,7 +212,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string  $path
      * @param  string|null  $name
      * @param  array|null  $headers
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \AIMuseVendor\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function download($path, $name = null, array $headers = [])
     {

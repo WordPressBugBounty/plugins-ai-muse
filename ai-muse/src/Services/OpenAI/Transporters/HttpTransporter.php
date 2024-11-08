@@ -31,6 +31,11 @@ class HttpTransporter implements Transporter
     ]);
   }
 
+  public function delete(string $endpoint)
+  {
+    return $this->request('DELETE', $endpoint);
+  }
+
   public function post(string $endpoint, array $request = [])
   {
     return $this->request('POST', $endpoint, [

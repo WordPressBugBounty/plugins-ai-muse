@@ -5,6 +5,7 @@ namespace AIMuse;
 use AIMuse\Database\Connector;
 use AIMuse\Database\Connection;
 use AIMuseVendor\Illuminate\Support\Facades\Log;
+use AIMuseVendor\Illuminate\Support\Facades\File;
 use AIMuseVendor\Illuminate\Filesystem\Filesystem;
 use AIMuseVendor\Illuminate\Database\DatabaseManager;
 use AIMuse\Database\Seeders\DatabaseSeeder;
@@ -30,7 +31,7 @@ class Database
      */
     global $wpdb;
 
-    $this->app->bind('db.connector.wordpress', function () {
+    $this->app->singleton('db.connector.wordpress', function () {
       return new Connector();
     });
 
@@ -89,11 +90,8 @@ class Database
   public function uninstall()
   {
     try {
-      /**
-       * @var Migrator $migrator
-       */
-      $migrator = $this->app->make('migrator');
-      $files = $migrator->getMigrationFiles($this->app->dir() . '/database/migrations');
+      $migrator = $this->migrator();
+      $files = $migrator->getMigrationFiles(aimuse()->dir() . '/database/migrations');
       $migrator->reset($files);
       if ($migrator->repositoryExists()) {
         $migrator->getRepository()->deleteRepository();
@@ -102,18 +100,37 @@ class Database
     }
   }
 
+  /**
+   * Get the migrator instance.
+   *
+   * @return Migrator
+   */
+  public function migrator()
+  {
+    return $this->app->make('migrator');
+  }
+
+  public function features()
+  {
+    $migrator = aimuse()->db()->migrator();
+    $files = $migrator->getMigrationFiles(aimuse()->dir() . '/database/migrations');
+    $features = [];
+    foreach ($files as $path) {
+      $migration = File::requireOnce($path);
+      if (!isset($migration->feature)) continue;
+      $features[$migration->feature][] = $path;
+    }
+    return $features;
+  }
+
   public function install()
   {
     Log::info('Installing database');
-    /**
-     * @var Migrator $migrator
-     */
-    $migrator = $this->app->make('migrator');
+    $migrator = $this->migrator();
     if (!$migrator->repositoryExists()) {
       $migrator->getRepository()->createRepository();
     }
-    $files = $migrator->getMigrationFiles($this->app->dir() . '/database/migrations');
-    $migrator->run($files);
+    $migrator->run($this->app->dir() . '/database/migrations');
 
     Log::info('Seeding database');
     /**

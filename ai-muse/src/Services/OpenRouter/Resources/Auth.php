@@ -16,7 +16,7 @@ class Auth
 
   public function key()
   {
-    $response = $this->transporter->get("auth/key", []);
+    $response = $this->transporter->get("auth/key");
     return $response;
   }
 }

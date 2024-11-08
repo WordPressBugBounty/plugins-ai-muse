@@ -4840,7 +4840,7 @@
                             )
                         ),
                         'plan_purchased',
-                        $this->get_text_x_inline( 'Yee-haw', 'interjection expressing joy or exuberance', 'yee-haw' ) . '!'
+                        $this->get_text_x_inline( 'Congratulations', 'interjection expressing joy or exuberance', 'congratulations' ) . '!'
                     );
                 }
 
@@ -21154,7 +21154,7 @@
                                 $addon_id
                             ),
                             'addon_plan_upgraded_' . $addon->slug,
-                            $this->get_text_x_inline( 'Yee-haw', 'interjection expressing joy or exuberance', 'yee-haw' ) . '!'
+                            $this->get_text_x_inline( 'Congratulations', 'interjection expressing joy or exuberance', 'congratulations' ) . '!'
                         );
                     }
                 }
@@ -24823,7 +24823,7 @@
                 $message_before_the_instructions .
                 $this->get_complete_upgrade_instructions( $plan_title ),
                 $message_id,
-                $this->get_text_x_inline( 'Yee-haw', 'interjection expressing joy or exuberance', 'yee-haw' ) . '!'
+                $this->get_text_x_inline( 'Congratulations', 'interjection expressing joy or exuberance', 'congratulations' ) . '!'
             );
         }
 

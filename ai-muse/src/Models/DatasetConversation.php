@@ -29,12 +29,7 @@ class DatasetConversation extends Model
   public function toCsv(): string
   {
     $this->prompt = str_replace('"', '""', $this->prompt);
-    $this->prompt = str_replace("\n", "\\n", $this->prompt);
-    $this->prompt = str_replace("\r", "\\r", $this->prompt);
-
     $this->response = str_replace('"', '""', $this->response);
-    $this->response = str_replace("\n", "\\n", $this->response);
-    $this->response = str_replace("\r", "\\r", $this->response);
 
     return '"' . $this->prompt . '","' . $this->response . '"' . PHP_EOL;
   }
@@ -48,5 +43,28 @@ class DatasetConversation extends Model
     $conversation->response = $row['messages'][1]['content'];
 
     return $conversation;
+  }
+
+  protected static function booted()
+  {
+    static::creating(function ($conversation) {
+      $conversation->character_count = strlen($conversation->prompt) + strlen($conversation->response);
+    });
+
+    static::updating(function ($conversation) {
+      $conversation->character_count = strlen($conversation->prompt) + strlen($conversation->response);
+    });
+
+    static::deleted(function ($conversation) {
+      $conversation->dataset->decrement('character_count', $conversation->character_count);
+    });
+
+    static::created(function ($conversation) {
+      $conversation->dataset->increment('character_count', $conversation->character_count);
+    });
+
+    static::updated(function ($conversation) {
+      $conversation->dataset->increment('character_count', $conversation->character_count - $conversation->getOriginal('character_count'));
+    });
   }
 }

@@ -3,7 +3,7 @@
 namespace AIMuseVendor\Illuminate\Support\Testing\Fakes;
 
 use Closure;
-use Illuminate\Bus\PendingBatch;
+use AIMuseVendor\Illuminate\Bus\PendingBatch;
 use AIMuseVendor\Illuminate\Contracts\Bus\QueueingDispatcher;
 use AIMuseVendor\Illuminate\Support\Arr;
 use AIMuseVendor\Illuminate\Support\Collection;
@@ -638,7 +638,7 @@ class BusFake implements QueueingDispatcher
      * Attempt to find the batch with the given ID.
      *
      * @param  string  $batchId
-     * @return \Illuminate\Bus\Batch|null
+     * @return \AIMuseVendor\Illuminate\Bus\Batch|null
      */
     public function findBatch(string $batchId)
     {
@@ -649,7 +649,7 @@ class BusFake implements QueueingDispatcher
      * Create a new batch of queueable jobs.
      *
      * @param  \AIMuseVendor\Illuminate\Support\Collection|array  $jobs
-     * @return \Illuminate\Bus\PendingBatch
+     * @return \AIMuseVendor\Illuminate\Bus\PendingBatch
      */
     public function batch($jobs)
     {
@@ -659,8 +659,8 @@ class BusFake implements QueueingDispatcher
     /**
      * Record the fake pending batch dispatch.
      *
-     * @param  \Illuminate\Bus\PendingBatch  $pendingBatch
-     * @return \Illuminate\Bus\Batch
+     * @param  \AIMuseVendor\Illuminate\Bus\PendingBatch  $pendingBatch
+     * @return \AIMuseVendor\Illuminate\Bus\Batch
      */
     public function recordPendingBatch(PendingBatch $pendingBatch)
     {

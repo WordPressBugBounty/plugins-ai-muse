@@ -6,7 +6,7 @@ use AIMuse\Models\History;
 use AIMuse\Helpers\StreamHelper;
 use AIMuse\Contracts\Transporter;
 use AIMuseVendor\Illuminate\Support\Facades\Log;
-use AIMuse\Attributes\GenerateTextOptions;
+use AIMuse\Data\GenerateTextOptions;
 use AIMuse\Exceptions\GenerateException;
 use AIMuse\Services\GoogleAI\Responses\ContentResponse;
 use Exception;
@@ -72,7 +72,7 @@ class Content
     ];
 
     if (!$options->contextLength) {
-      $options->contextLength = $options->model->defaults['maxInputs'];
+      $options->contextLength = $options->model->meta['defaults']['contextLength'];
     }
 
     $options->contextLength -= $this->estimateTokens($options->systemPrompt);
@@ -184,6 +184,7 @@ class Content
     $history = new History([
       'user_id' => get_current_user_id(),
       'model' => $options->model->name,
+      'model_type' => 'text',
       'service' => 'googleai',
       'component' => $options->component,
       'tokens' => $tokens,
@@ -217,23 +218,8 @@ class Content
 
   public function summary(array $messages)
   {
-    try {
-      $tokens = aimuse()->api()->summary([
-        'tokenizer' => 'gemini',
-        'messages' => $messages
-      ]);
-
-      foreach ($messages as $key => &$message) {
-        $message['tokens'] = $tokens[$key];
-      }
-    } catch (\Throwable $th) {
-      Log::error('GoogleAI token summary error', [
-        'error' => $th
-      ]);
-
-      foreach ($messages as &$message) {
-        $message['tokens'] = $this->estimateTokens($message['content']);
-      }
+    foreach ($messages as &$message) {
+      $message['tokens'] = $this->estimateTokens($message['content']);
     }
 
     return $messages;

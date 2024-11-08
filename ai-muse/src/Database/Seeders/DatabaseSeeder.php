@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         DatasetSeeder::class,
       ]);
     } catch (\Exception $e) {
-      return false;
+      return;
     }
   }
 }

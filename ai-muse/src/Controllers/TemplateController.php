@@ -174,9 +174,10 @@ class TemplateController extends Controller
    */
   public function restore(Request $request)
   {
-    $this->checkPremium();
-
-    $template = Template::query()->find($request->id);
+    /**
+     * @var Template $template
+     */
+    $template = Template::query()->find($request->json('id'));
 
     if (!$template) {
       throw new ControllerException([

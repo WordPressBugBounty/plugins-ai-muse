@@ -14,9 +14,9 @@ class Models
     $this->transporter = $transporter;
   }
 
-  public function get($options = [])
+  public function get()
   {
-    $response = $this->transporter->get("models", $options);
+    $response = $this->transporter->get("models");
     return ModelsResponse::fromJson($response);
   }
 }

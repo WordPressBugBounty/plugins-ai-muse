@@ -3,7 +3,7 @@
 namespace AIMuseVendor\Illuminate\Support;
 
 use AIMuseVendor\Illuminate\Support\Traits\Macroable;
-use League\CommonMark\GithubFlavoredMarkdownConverter;
+use AIMuseVendor\League\CommonMark\GithubFlavoredMarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;

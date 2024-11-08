@@ -33,6 +33,7 @@ class Image
     History::query()->create([
       'user_id' => get_current_user_id(),
       'model' => $options['model'],
+      'model_type' => 'image',
       'service' => 'openai',
       'component' => $component,
       'tokens' => 1,

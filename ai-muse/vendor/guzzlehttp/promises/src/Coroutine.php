@@ -18,7 +18,7 @@ use Throwable;
  * This can lead to less verbose code when doing lots of sequential async calls
  * with minimal processing in between.
  *
- *     use AIMuseVendor\GuzzleHttp\Promise;
+ *     use GuzzleHttp\Promise;
  *
  *     function createPromise($value) {
  *         return new Promise\FulfilledPromise($value);
@@ -84,8 +84,8 @@ final class Coroutine implements PromiseInterface
     }
 
     public function then(
-        callable $onFulfilled = null,
-        callable $onRejected = null
+        ?callable $onFulfilled = null,
+        ?callable $onRejected = null
     ): PromiseInterface {
         return $this->result->then($onFulfilled, $onRejected);
     }

@@ -15,7 +15,7 @@ class PricingHelper
       return 0;
     }
 
-    $pricing = $model->pricing;
+    $pricing = $model->meta['pricing'];
 
     if ($pricing) {
       $inputPrice = $options['tokens']['input'] * $pricing['text']['input'];
@@ -34,7 +34,7 @@ class PricingHelper
       return 0;
     }
 
-    $pricing = $model->pricing;
+    $pricing = $model->meta['pricing'];
 
     if ($pricing) {
       $pricing = collect($pricing['image']);

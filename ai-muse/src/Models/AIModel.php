@@ -8,6 +8,7 @@ use AIMuse\Controllers\Request;
 use AIMuse\Exceptions\ControllerException;
 use AIMuse\Exceptions\ModelSettingException;
 use AIMuse\Models\Casts\Serialize;
+use AIMuseVendor\Illuminate\Support\Carbon;
 use AIMuseVendor\Illuminate\Support\Facades\Log;
 
 class AIModel extends Model
@@ -23,12 +24,10 @@ class AIModel extends Model
     'openrouter' => 'openRouterApiKey'
   ];
 
-  public $timestamps = false;
-
   protected $casts = [
-    'pricing' => Serialize::class,
     'settings' => Serialize::class,
-    'defaults' => Serialize::class,
+    'meta' => Serialize::class,
+    'custom' => 'boolean',
   ];
 
   public static function getByRequest(Request $request, string $settingKey)
@@ -81,7 +80,7 @@ class AIModel extends Model
         'service' => $model->service,
         'settings' => $model->settings,
       ];
-    })->filter(fn ($model) => $model !== null);
+    })->filter(fn($model) => $model !== null);
 
     return $models->toArray();
   }
@@ -89,7 +88,7 @@ class AIModel extends Model
   public static function import(array $data)
   {
     foreach ($data as $backup) {
-      $model = static::query()->where('name', $backup['name'])->where('service', $backup['service'])->first();
+      $model = static::query()->find($backup['id']);
       Log::info('Model importing', ['model' => $model, 'backup' => $backup]);
       if ($model) {
         $model->settings = $backup['settings'];
@@ -98,33 +97,60 @@ class AIModel extends Model
     }
   }
 
+  public static function generateId($name, $service, $type)
+  {
+    $id = hash_hmac('sha1', $name . $service . $type, 'aimuse-model-id');
+    $id = substr($id, 0, 10);
+    return $id;
+  }
+
   public static function sync()
   {
-    $models = aimuse()->api()->models();
+    $files = array_keys(static::$keyNames);
+    $models = collect([]);
 
-    static::query()->where('custom', false)->delete();
+    foreach ($files as $file) {
+      $path = aimuse()->dir() . "/database/models/{$file}.json";
+      if (!file_exists($path)) {
+        throw new Exception("File not found: {$path}");
+      }
 
-    foreach ($models as $model) {
-      $id = hash_hmac('sha1', $model['name'] . $model['service'] . $model['type'], 'aimuse-model-id');
-      $id = substr($id, 0, 10);
+      $data = json_decode(file_get_contents($path), true);
+      $models->push(...$data);
+    }
 
-      $model = static::updateOrCreate([
-        'id' => $id,
+    $models = $models->map(function ($model) {
+      $model['id'] = static::generateId($model['name'], $model['service'], $model['type']);
+
+      return $model;
+    });
+
+    Log::debug('Deleting old models');
+    static::query()
+      ->where('custom', false)
+      ->whereNotIn('id', $models->pluck('id'))
+      ->delete();
+
+    $models->each(function ($model) {
+      Log::debug('Model syncing', ['model' => $model]);
+      $created = static::query()->updateOrCreate([
+        'id' => $model['id'],
       ], [
         'name' => $model['name'],
         'service' => $model['service'],
         'type' => $model['type'],
-        'pricing' => $model['pricing'] ?? [],
-        'defaults' => $model['defaults'] ?? [],
+        'meta' => $model['meta'],
+        'created_at' => Carbon::createFromTimestamp($model['created']),
       ]);
+      Log::debug('Model created', ['model' => $created]);
 
-      if ($model->name == 'gpt-3.5-turbo') {
-        Settings::default('textModel', $model->id);
-      } elseif ($model->name == 'dall-e-3') {
-        Settings::default('imageModel', $model->id);
+      if ($created->name == 'gpt-4o-mini') {
+        Settings::default('textModel', $created->id);
+      } elseif ($created->name == 'dall-e-3') {
+        Settings::default('imageModel', $created->id);
       }
-    }
+    });
 
-    return $models;
+    return $models->toArray();
   }
 }

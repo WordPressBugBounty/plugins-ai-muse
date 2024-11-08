@@ -12,7 +12,7 @@ use RuntimeException;
  * @method static \AIMuseVendor\Illuminate\Contracts\Auth\Authenticatable|null user()
  * @method static \AIMuseVendor\Illuminate\Contracts\Auth\Guard|\AIMuseVendor\Illuminate\Contracts\Auth\StatefulGuard guard(string|null $name = null)
  * @method static \AIMuseVendor\Illuminate\Contracts\Auth\UserProvider|null createUserProvider(string $provider = null)
- * @method static \Symfony\Component\HttpFoundation\Response|null onceBasic(string $field = 'email',array $extraConditions = [])
+ * @method static \AIMuseVendor\Symfony\Component\HttpFoundation\Response|null onceBasic(string $field = 'email',array $extraConditions = [])
  * @method static bool attempt(array $credentials = [], bool $remember = false)
  * @method static bool hasUser()
  * @method static bool check()

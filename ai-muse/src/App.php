@@ -9,9 +9,19 @@ use AIMuse\Models\Settings;
 use AIMuse\Services\Api\Client;
 use AIMuseVendor\Monolog\Handler\StreamHandler;
 use AIMuseVendor\Illuminate\Container\Container;
+use AIMuseVendor\Illuminate\Events\Dispatcher;
+use AIMuseVendor\Illuminate\Filesystem\Filesystem;
 use AIMuseVendor\Illuminate\Support\Facades\File;
 use AIMuseVendor\Illuminate\Support\Facades\Facade;
+use AIMuseVendor\Illuminate\View\Compilers\BladeCompiler;
+use AIMuseVendor\Illuminate\View\DynamicComponent;
+use AIMuseVendor\Illuminate\View\Engines\CompilerEngine;
+use AIMuseVendor\Illuminate\View\Engines\EngineResolver;
+use AIMuseVendor\Illuminate\View\Factory;
+use AIMuseVendor\Illuminate\View\FileViewFinder;
 use AIMuseVendor\Monolog\Formatter\JsonFormatter;
+use AIMuseVendor\Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use AIMuseVendor\Illuminate\Contracts\View\Factory as ViewFactoryContract;
 
 class App extends Container
 {
@@ -27,11 +37,17 @@ class App extends Container
   public function register()
   {
 
-    Facade::setFacadeApplication($this);
+    $this->singleton('app', function () {
+      return $this;
+    });
 
-    $this->bind(Database::class, function ($app) {
+    $this->singleton(ApplicationContract::class, 'app');
+
+    $this->singleton(Database::class, function ($app) {
       return new Database($app);
     });
+
+    $this->registerView();
 
     $this->singleton('log', function () {
       $file = $this->logPath();
@@ -82,7 +98,8 @@ class App extends Container
         'menu' => array(
           'slug' => $this->name(),
           'support' => false,
-          'contact' => false
+          'contact' => false,
+          'first-path' => "admin.php?page={$this->name()}#/settings/general",
         ),
       ]);
     });
@@ -97,6 +114,62 @@ class App extends Container
 
         return $wp_filesystem;
       }
+    });
+
+    Facade::setFacadeApplication($this);
+  }
+
+  public function getNamespace()
+  {
+    return 'aimuse';
+  }
+
+  private function registerView()
+  {
+    $this->bind('files', fn() => new Filesystem());
+    $this->bind('events', fn() => new Dispatcher());
+
+    $this->bind('view.finder', function ($app) {
+      return new FileViewFinder($app['files'], [
+        aimuse()->dir() . 'views'
+      ]);
+    });
+
+    $this->singleton('blade.compiler', function ($app) {
+      $blade = new BladeCompiler($app['files'], WP_CONTENT_DIR . '/uploads/aimuse/cache/views');
+
+      $blade->component('dynamic-component', DynamicComponent::class);
+
+      return $blade;
+    });
+
+    $this->singleton('view.engine.resolver', function () {
+      $resolver = new EngineResolver();
+
+      $resolver->register('blade', function () {
+        $compiler = new CompilerEngine(
+          $this->make('blade.compiler'),
+          $this->make('files'),
+        );
+
+        return $compiler;
+      });
+
+      return $resolver;
+    });
+
+    $this->singleton('view', function ($app) {
+      $resolver = $app['view.engine.resolver'];
+      $finder = $app['view.finder'];
+      $factory = new Factory($resolver, $finder, $app['events']);
+      $factory->setContainer($app);
+      $factory->share('app', $app);
+
+      return $factory;
+    });
+
+    $this->singleton(ViewFactoryContract::class, function ($app) {
+      return $app['view'];
     });
   }
 
@@ -125,6 +198,16 @@ class App extends Container
     Schedules::init();
 
     aimuse()->freemius();
+  }
+
+  /**
+   * Retrieves the view instance.
+   *
+   * @return \AIMuseVendor\Illuminate\View\Factory The view instance.
+   */
+  public function view()
+  {
+    return $this->get('view');
   }
 
   public function define($key, $value)
@@ -181,7 +264,7 @@ class App extends Container
   }
 
   /**
-   * Undocumented function
+   * Freemius instance for the plugin.
    *
    * @return \Freemius
    */
@@ -190,6 +273,13 @@ class App extends Container
     return $this->get('freemius');
   }
 
+  /**
+   * Retrieves the Freemius ID.
+   *
+   * This function returns the Freemius ID associated with the plugin.
+   *
+   * @return string The Freemius ID.
+   */
   public function freemiusId()
   {
     return static::$freemiusId;
@@ -205,6 +295,11 @@ class App extends Container
     return static::$version;
   }
 
+  /**
+   * Retrieves the plugin file path.
+   *
+   * @return string The plugin file.
+   */
   public function file()
   {
     return static::$file;
@@ -220,6 +315,12 @@ class App extends Container
     return static::$prefix;
   }
 
+  /**
+   * Retrieves the plugin URL.
+   *
+   * @param string $path The path to append to the URL.
+   * @return string The plugin URL.
+   */
   public function url(string $path = '')
   {
     return static::$url . $path;

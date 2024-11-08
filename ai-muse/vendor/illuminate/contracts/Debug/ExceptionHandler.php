@@ -29,7 +29,7 @@ interface ExceptionHandler
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $e
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \AIMuseVendor\Symfony\Component\HttpFoundation\Response
      *
      * @throws \Throwable
      */

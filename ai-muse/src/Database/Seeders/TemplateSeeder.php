@@ -41,6 +41,7 @@ class TemplateSeeder extends Seeder
         'prompt' => $template['prompt'],
         'option' => $template['option'] ?? null,
         'capabilities' => $template['capabilities'] ?? [],
+        'enabled' => $template['enabled'] ?? true,
       ]);
     }
   }

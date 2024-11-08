@@ -14,7 +14,7 @@ namespace AIMuseVendor\Illuminate\Support\Facades;
  * @method static bool exists(string $view)
  * @method static mixed share(array|string $key, $value = null)
  *
- * @see \Illuminate\View\Factory
+ * @see \AIMuseVendor\Illuminate\View\Factory
  */
 class View extends Facade
 {

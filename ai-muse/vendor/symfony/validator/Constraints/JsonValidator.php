@@ -14,6 +14,7 @@ namespace AIMuseVendor\Symfony\Component\Validator\Constraints;
 use AIMuseVendor\Symfony\Component\Validator\Constraint;
 use AIMuseVendor\Symfony\Component\Validator\ConstraintValidator;
 use AIMuseVendor\Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use AIMuseVendor\Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * @author Imad ZAIRIG <imadzairig@gmail.com>
@@ -34,7 +35,7 @@ class JsonValidator extends ConstraintValidator
         }
 
         if (!\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
+            throw new UnexpectedValueException($value, 'string');
         }
 
         $value = (string) $value;

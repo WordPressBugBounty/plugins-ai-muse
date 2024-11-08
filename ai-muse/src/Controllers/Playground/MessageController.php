@@ -37,7 +37,7 @@ class MessageController extends Controller
       throw ControllerException::make('Chat not found', 404);
     }
 
-    $lastMessage = $chat->messages()->latest()->first();
+    $lastMessage = $chat->messages()->latest("id")->first();
 
     if ($lastMessage && $lastMessage->role === $request->role) {
       throw ControllerException::make('You cannot send two messages in a row', 400);

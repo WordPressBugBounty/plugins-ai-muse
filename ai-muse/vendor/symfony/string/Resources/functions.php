@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\String;
+namespace AIMuseVendor\Symfony\Component\String;
 
 if (!\function_exists(u::class)) {
     function u(?string $string = ''): UnicodeString

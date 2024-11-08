@@ -9,7 +9,6 @@ use AIMuse\Exceptions\ControllerException;
 use AIMuse\Helpers\PremiumHelper;
 use AIMuse\Middleware\AdminAuth;
 use AIMuse\Validators\Validator;
-use AIMuse\Helpers\ResponseHelper;
 use AIMuseVendor\Illuminate\Support\Facades\DB;
 use AIMuse\Validators\HistoryValidator;
 use AIMuse\Validators\HistoryTableValidator;
@@ -35,6 +34,7 @@ class HistoryController extends Controller
       ->select([
         DB::raw('SUM(tokens) as tokens'),
         DB::raw('SUM(price) as price'),
+        'model_type'
       ])->orderBy('created_at', 'ASC');
 
     $timezone = $request->header('X-Timezone') ?? wp_timezone_string();

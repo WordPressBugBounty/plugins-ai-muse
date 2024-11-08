@@ -19,6 +19,7 @@ class Request
   protected array $query;
   protected array $files;
   protected array $json;
+  public string $id;
 
   public function __construct(WP_REST_Request $request)
   {
@@ -40,8 +41,23 @@ class Request
     }
 
     $this->params = $request->get_params();
-
     $this->parseHeaders();
+    $this->id = $this->genetateId();
+  }
+
+  private function genetateId()
+  {
+    return hash_hmac('sha1', uniqid('aimuse-request') . microtime(true) . $this->method . $this->path, wp_salt());
+  }
+
+  public static function make(array $data, string $type = 'json'): Request
+  {
+    $wpRequest = new WP_REST_Request();
+    $request = new self($wpRequest);
+
+    $request->merge($data, $type);
+
+    return $request;
   }
 
   public function param(string $name, $default = null)
@@ -164,24 +180,27 @@ class Request
    * Validates the given array of rules against the request data.
    *
    * @param array|string|Validator $instance The rules array or the name of the validator class or instance.
+   * @param string $type The type of data to validate. Accepted values are 'post', 'json', or 'all'.
    * @return ConstraintViolationListInterface The list of constraint violations.
    *
    * @see https://symfony.com/doc/current/reference/constraints.html for available constraints.
    */
-  public function validate($instance): ConstraintViolationListInterface
+  public function validate($instance, $type = 'all'): ConstraintViolationListInterface
   {
+    $data = $this->$type();
+
     if (is_array($instance)) {
       $validator = Validation::createValidator();
-      $constraint = new Constraints\Collection($validator);
-      return $validator->validate($this->all(), $constraint);
+      $constraint = new Constraints\Collection($instance);
+      return $validator->validate($data, $constraint);
     } elseif (is_string($instance)) {
       $validator = aimuse()->make($instance);
-      return $validator->validate($this->all());
+      return $validator->validate($data);
     } elseif ($instance instanceof Validator) {
-      return $instance->validate($this->all());
+      return $instance->validate($data);
     } elseif ($instance instanceof Constraint) {
       $validator = Validation::createValidator();
-      return $validator->validate($this->all(), $instance);
+      return $validator->validate($data, $instance);
     } else {
       throw new \Exception("Invalid validator given.", 1);
     }

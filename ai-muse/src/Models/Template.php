@@ -3,6 +3,7 @@
 namespace AIMuse\Models;
 
 use AIMuse\Database\Model;
+use AIMuseVendor\Illuminate\Support\Arr;
 use AIMuseVendor\Illuminate\Support\Facades\File;
 
 /**
@@ -85,6 +86,7 @@ class Template extends Model
       $this->update([
         'prompt' => $template['prompt'],
         'option' => $template['option'] ?? null,
+        'capabilities' => $template['capabilities'] ?? [],
       ]);
 
       return true;
@@ -99,6 +101,9 @@ class Template extends Model
     $templates = $templates->map(function ($template) {
       return [
         'slug' => $template->slug,
+        'type' => $template->type,
+        'name' => $template->name,
+        'description' => $template->description,
         'category' => $template->category->name,
         'enabled' => $template->enabled,
         'prompt' => $template->prompt,
@@ -114,14 +119,8 @@ class Template extends Model
   {
     foreach ($data as $template) {
       $category = TemplateCategory::query()->firstOrCreate(['name' => $template['category']]);
-
-      static::updateOrCreate(['slug' => $template['slug']], [
-        'category_id' => $category->id,
-        'prompt' => $template['prompt'] ?? null,
-        'option' => $template['option'] ?? null,
-        'capabilities' => $template['capabilities'] ?? [],
-        'enabled' => $template['enabled'] ?? false,
-      ]);
+      $template['category_id'] = $category->id;
+      static::updateOrCreate(['slug' => $template['slug']], Arr::except($template, 'category'));
     }
   }
 }

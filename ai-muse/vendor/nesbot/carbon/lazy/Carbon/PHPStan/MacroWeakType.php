@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Carbon\PHPStan;
+namespace AIMuseVendor\Carbon\PHPStan;
 
 if (!class_exists(LazyMacro::class, false)) {
     abstract class LazyMacro extends AbstractReflectionMacro

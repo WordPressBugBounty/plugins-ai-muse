@@ -8,7 +8,7 @@ interface QueueingDispatcher extends Dispatcher
      * Attempt to find the batch with the given ID.
      *
      * @param  string  $batchId
-     * @return \Illuminate\Bus\Batch|null
+     * @return \AIMuseVendor\Illuminate\Bus\Batch|null
      */
     public function findBatch(string $batchId);
 
@@ -16,7 +16,7 @@ interface QueueingDispatcher extends Dispatcher
      * Create a new batch of queueable jobs.
      *
      * @param  \AIMuseVendor\Illuminate\Support\Collection|array  $jobs
-     * @return \Illuminate\Bus\PendingBatch
+     * @return \AIMuseVendor\Illuminate\Bus\PendingBatch
      */
     public function batch($jobs);
 

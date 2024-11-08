@@ -14,6 +14,7 @@ use AIMuse\Exceptions\ControllerException;
 use AIMuse\Validators\Datasets\Conversations\CreateConversationValidator;
 use AIMuse\Validators\Datasets\Conversations\UpdateConversationValidator;
 use AIMuse\Validators\Datasets\Conversations\CreateBulkConversationValidator;
+use AIMuseVendor\Symfony\Component\Validator\Constraints;
 
 class DatasetConversationController extends Controller
 {
@@ -48,7 +49,12 @@ class DatasetConversationController extends Controller
       throw ControllerException::make('Dataset not found', 404);
     }
 
-    $conversation = $dataset->conversations()->create($request->json());
+    $conversation = array_merge($request->json(), [
+      'character_count' => strlen($request->json('prompt')) + strlen($request->json('response')),
+    ]);
+
+    $conversation = $dataset->conversations()->create($conversation);
+    $dataset->increment('character_count', $conversation->character_count);
 
     return new WP_REST_Response($conversation, 201);
   }
@@ -76,9 +82,12 @@ class DatasetConversationController extends Controller
       $conversation['created_at'] = current_time('mysql');
       $conversation['updated_at'] = current_time('mysql');
       $conversation['dataset_id'] = $dataset->id;
+      $conversation['character_count'] = strlen($conversation['prompt']) + strlen($conversation['response']);
     }
 
     DatasetConversation::query()->insert($conversations);
+
+    $dataset->increment('character_count', array_sum(array_column($conversations, 'character_count')));
 
     return new WP_REST_Response([
       'message' => 'Conversations created successfully',
@@ -102,7 +111,15 @@ class DatasetConversationController extends Controller
       throw ControllerException::make('Conversation not found', 404);
     }
 
-    $conversation->update($request->json());
+    $originalCharacterCount = $conversation->character_count;
+
+    $data = array_merge($request->json(), [
+      'character_count' => strlen($request->json('prompt')) + strlen($request->json('response')),
+    ]);
+
+    $conversation->update($data);
+
+    $conversation->dataset()->increment('character_count', $conversation->character_count - $originalCharacterCount);
 
     return new WP_REST_Response($conversation, 200);
   }
@@ -118,10 +135,43 @@ class DatasetConversationController extends Controller
       throw ControllerException::make('Conversation not found', 404);
     }
 
+    $conversation->dataset()->decrement('character_count', $conversation->character_count);
     $conversation->delete();
 
     return new WP_REST_Response([
       'message' => 'Conversation deleted successfully',
+    ], 200);
+  }
+
+  /**
+   * @Route(path="/admin/finetuning/datasets/conversations/delete", method="POST")
+   */
+  public function bulkDelete(Request $request)
+  {
+    $violations = $request->validate([
+      'ids' => [
+        new Constraints\NotBlank(),
+        new Constraints\Type('array'),
+        new Constraints\All([
+          new Constraints\Type('int'),
+        ]),
+      ]
+    ], 'json');
+
+    if ($violations->count() > 0) {
+      throw new ControllerException(Validator::toArray($violations), 400);
+    }
+
+    $conversations = DatasetConversation::query()->whereIn('id', $request->json('ids'))->get();
+    $dataset_id = $conversations->first()->dataset_id;
+
+    $deleted = DatasetConversation::query()->whereIn('id', $request->json('ids'))->delete();
+
+    Dataset::query()->find($dataset_id)->decrement('character_count', $conversations->sum('character_count'));
+
+    return new WP_REST_Response([
+      'message' => 'Conversations deleted successfully',
+      'deleted' => $deleted,
     ], 200);
   }
 
@@ -137,6 +187,7 @@ class DatasetConversationController extends Controller
     }
 
     $dataset->conversations()->delete();
+    $dataset->update(['character_count' => 0]);
 
     return new WP_REST_Response([
       'message' => 'Conversations cleared successfully',

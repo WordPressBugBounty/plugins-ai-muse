@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Carbon;
+namespace AIMuseVendor\Carbon;
 
 use AIMuseVendor\Symfony\Component\Translation\MessageCatalogueInterface;
 

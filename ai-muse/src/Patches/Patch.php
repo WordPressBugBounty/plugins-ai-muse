@@ -4,6 +4,11 @@ namespace AIMuse\Patches;
 
 class Patch
 {
+  /**
+   * The version this patch applies to.
+   *
+   * @var string
+   */
   public string $version;
 
   public function __construct()
@@ -18,7 +23,7 @@ class Patch
     throw new \Exception('Not implemented');
   }
 
-  public function applied(): bool
+  public function shouldApply(): bool
   {
     return version_compare(aimuse()->version(), $this->version, '>=');
   }

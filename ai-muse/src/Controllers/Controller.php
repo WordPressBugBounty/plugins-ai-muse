@@ -14,9 +14,13 @@ class Controller
 {
   public array $middlewares = [];
 
+  public function throw($errors, $code = 400)
+  {
+    throw new ControllerException($errors, $code);
+  }
+
   public function __call($name, $arguments)
   {
-
 
     $name = ltrim($name, '_');
 
@@ -37,12 +41,14 @@ class Controller
         return $this->$name($request);
       } catch (ControllerException $error) {
         return new WP_REST_Response([
-          'errors' => $error->getErrors()
+          'errors' => $error->getErrors(),
+          'request' => $request->id,
         ], $error->getCode());
       } catch (Throwable $error) {
         Log::error($error->getMessage(), [
           'error' => $error,
           'trace' => $error->getTrace(),
+          'request' => $request->id,
         ]);
 
         $error = [
@@ -62,6 +68,7 @@ class Controller
           'errors' => [
             $error
           ],
+          'request' => $request->id,
         ], 500);
       }
 

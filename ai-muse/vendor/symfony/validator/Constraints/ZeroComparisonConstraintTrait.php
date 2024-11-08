@@ -21,7 +21,7 @@ use AIMuseVendor\Symfony\Component\Validator\Exception\ConstraintDefinitionExcep
  */
 trait ZeroComparisonConstraintTrait
 {
-    public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
+    public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, $payload = null)
     {
         if (null === $options) {
             $options = [];

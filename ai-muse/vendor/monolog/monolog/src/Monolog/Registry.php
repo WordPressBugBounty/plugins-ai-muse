@@ -20,16 +20,16 @@ use InvalidArgumentException;
  * via static method calls on this class.
  *
  * <code>
- * $application = new AIMuseVendor\Monolog\Logger('application');
- * $api = new AIMuseVendor\Monolog\Logger('api');
+ * $application = new Monolog\Logger('application');
+ * $api = new Monolog\Logger('api');
  *
- * AIMuseVendor\Monolog\Registry::addLogger($application);
- * AIMuseVendor\Monolog\Registry::addLogger($api);
+ * Monolog\Registry::addLogger($application);
+ * Monolog\Registry::addLogger($api);
  *
  * function testLogger()
  * {
- *     AIMuseVendor\Monolog\Registry::api()->error('Sent to $api Logger instance');
- *     AIMuseVendor\Monolog\Registry::application()->error('Sent to $application Logger instance');
+ *     Monolog\Registry::api()->error('Sent to $api Logger instance');
+ *     Monolog\Registry::application()->error('Sent to $application Logger instance');
  * }
  * </code>
  *

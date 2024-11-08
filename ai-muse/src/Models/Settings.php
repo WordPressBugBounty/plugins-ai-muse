@@ -17,7 +17,7 @@ class Settings extends Model
   /**
    * Undocumented variable
    *
-   * @var \AIMuseVendor\Illuminate\Database\Eloquent\Collection
+   * @var \AIMuseVendor\Illuminate\Database\Eloquent\Collection|null
    */
   private static $cache = null;
 
@@ -39,22 +39,22 @@ class Settings extends Model
 
   private static function cache()
   {
-    if (static::$cache === null) {
-      static::$cache = static::all();
+    if (self::$cache === null) {
+      self::$cache = static::all();
     }
 
-    return static::$cache;
+    return self::$cache;
   }
 
   public static function clearCache()
   {
-    static::$cache = null;
+    self::$cache = null;
   }
 
   public static function get($name, $default = [])
   {
     try {
-      $setting = static::cache()->where('name', $name)->first();
+      $setting = self::cache()->where('name', $name)->first();
       return $setting ? unserialize($setting->data) : $default;
     } catch (\Exception $e) {
       return $default;
@@ -64,7 +64,7 @@ class Settings extends Model
   public static function set($name, $data)
   {
     try {
-      $setting = static::cache()->where('name', $name)->first() ?? new static(['name' => $name]);
+      $setting = self::cache()->where('name', $name)->first() ?? new self(['name' => $name]);
       $setting->data = serialize($data);
       $setting->save();
       return $setting;
@@ -93,7 +93,7 @@ class Settings extends Model
 
   public static function export()
   {
-    $settings = static::cache();
+    $settings = self::cache();
     $backup = [];
     foreach ($settings as $setting) {
       if (in_array($setting->name, static::$backupKeys)) {

@@ -20,7 +20,11 @@ class Processor extends BaseProcessor
   {
     $query->getConnection()->insert($sql, $values);
 
-    $id = $query->getConnection()->getPdo()->insert_id;
+    /**
+     * @var Connection $connection
+     */
+    $connection = $query->getConnection();
+    $id = $connection->getPdo()->insert_id;
 
     return is_numeric($id) ? (int) $id : $id;
   }

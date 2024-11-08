@@ -15,8 +15,6 @@
 
   const container = document.querySelector("#fs_pricing");
 
-  console.log(container);
-
   if (!container) return;
 
   container.prepend(frame_container);

@@ -10,16 +10,35 @@ class Dataset extends Model
   protected $table = 'aimuse_datasets';
   protected $guarded = [];
   protected static $files = [];
+  public static $datasetsDir = WP_CONTENT_DIR . "/uploads/aimuse/datasets";
+  public $appends = ['hash'];
 
   public function conversations()
   {
     return $this->hasMany(DatasetConversation::class, 'dataset_id');
   }
 
+  public function getHashAttribute()
+  {
+    return hash_hmac('sha1', $this->id . $this->slug, wp_salt());
+  }
+
+  public function getBackupFileName()
+  {
+    $hash = $this->hash;
+    return "dataset-{$hash}";
+  }
+
+  public function getBackupFilePath(string $type)
+  {
+    $fileName = $this->getBackupFileName();
+    return static::$datasetsDir . "/$fileName.$type";
+  }
+
   public function export(int $limit, int $offset, string $type)
   {
-    $fileName = hash_hmac('sha1', $this->id, wp_salt());
-    $datasetsDir = WP_CONTENT_DIR . "/uploads/aimuse/datasets";
+    $fileName = $this->getBackupFileName();
+    $datasetsDir = static::$datasetsDir;
     $filePath = "$datasetsDir/$fileName.$type";
     $fileUrl = content_url("/uploads/aimuse/datasets/$fileName.$type");
 

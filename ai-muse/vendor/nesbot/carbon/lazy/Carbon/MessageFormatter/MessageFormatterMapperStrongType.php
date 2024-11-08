@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Carbon\MessageFormatter;
+namespace AIMuseVendor\Carbon\MessageFormatter;
 
 use AIMuseVendor\Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 

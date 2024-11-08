@@ -2,7 +2,7 @@
 
 namespace AIMuse\Services\OpenRouter\Resources;
 
-use AIMuse\Attributes\GenerateTextOptions;
+use AIMuse\Data\GenerateTextOptions;
 use AIMuseVendor\GuzzleHttp\Psr7\Utils;
 use AIMuse\Contracts\Transporter;
 use AIMuse\Exceptions\GenerateException;
@@ -40,8 +40,7 @@ class Chat
   /**
    * Create a stream of chat completions
    *
-   * @param array $request
-   * @param callable $callback
+   * @param GenerateTextOptions $options
    * @return void
    */
   public function stream(GenerateTextOptions $options)
@@ -76,6 +75,8 @@ class Chat
         $request[$key] = $value;
       }
     }
+
+    $request['transforms'] = ["middle-out"];
 
     $response = $this->transporter->stream("chat/completions", $request);
 
@@ -144,6 +145,7 @@ class Chat
     $history = new History([
       'user_id' => get_current_user_id(),
       'model' => $request['model'],
+      'model_type' => 'text',
       'service' => 'openrouter',
       'component' => $options->component,
       'data' => [

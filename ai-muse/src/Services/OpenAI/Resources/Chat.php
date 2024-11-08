@@ -2,17 +2,14 @@
 
 namespace AIMuse\Services\OpenAI\Resources;
 
-use AIMuse\Attributes\GenerateTextOptions;
+use AIMuse\Data\GenerateTextOptions;
 use AIMuseVendor\GuzzleHttp\Psr7\Utils;
 use AIMuse\Contracts\Transporter;
 use AIMuse\Exceptions\GenerateException;
 use AIMuse\Helpers\PricingHelper;
 use AIMuse\Models\History;
-use AIMuse\Models\Settings;
-use AIMuse\Services\OpenAI\OpenAI;
-use AIMuseVendor\Psr\Http\Message\StreamInterface;
 use AIMuse\Services\OpenAI\Responses\ChatResponse;
-use AIMuse\Services\Api\Stream;
+use Exception;
 use AIMuseVendor\Illuminate\Support\Facades\Log;
 
 class Chat
@@ -77,8 +74,7 @@ class Chat
   /**
    * Create a stream of chat completions
    *
-   * @param array $request
-   * @param callable $callback
+   * @param GenerateTextOptions $options
    * @return void
    */
   public function stream(GenerateTextOptions $options)
@@ -90,7 +86,7 @@ class Chat
     ];
 
     if (!$options->contextLength) {
-      $options->contextLength = $options->model->defaults['contextLength'];
+      $options->contextLength = $options->model->meta['defaults']['contextLength'];
     }
 
     if (is_array($options->model->settings)) {
@@ -203,6 +199,7 @@ class Chat
     $history = new History([
       'user_id' => get_current_user_id(),
       'model' => $request['model'],
+      'model_type' => 'text',
       'service' => 'openai',
       'component' => $options->component,
       'tokens' => $tokens['total_tokens'],
@@ -221,39 +218,47 @@ class Chat
     $response->close();
   }
 
+  private function estimateCount(array $data)
+  {
+    $inputTokens = 0;
+    $outputTokens = 0;
+
+    if (isset($data['prompts'])) {
+      foreach ($data['prompts'] as $prompt) {
+        $inputTokens += $this->estimateTokens($prompt);
+      }
+    }
+
+    if (isset($data['completions'])) {
+      foreach ($data['completions'] as $completion) {
+        $outputTokens += strlen($completion);
+      }
+    }
+
+    $inputTokens = intval($inputTokens);
+    $outputTokens = intval($outputTokens / 4);
+
+    return [
+      'prompt_tokens' => $inputTokens,
+      'completion_tokens' => $outputTokens,
+      'total_tokens' => $inputTokens + $outputTokens,
+    ];
+  }
+
   private function count(array $data)
   {
-    try {
-      return aimuse()->api()->count($data);
-    } catch (\Throwable $th) {
-      Log::warning("OpenAI token counting using the api service failed. Tokens will be counted in the traditional way.", [
-        'error' => $th
-      ]);
+    return $this->estimateCount($data);
 
-      $inputTokens = 0;
-      $outputTokens = 0;
+    // We turned it off for now because it was slow
+    // try {
+    //   return aimuse()->api()->count($data);
+    // } catch (\Throwable $th) {
+    //   Log::warning("OpenAI token counting using the api service failed. Tokens will be counted in the traditional way.", [
+    //     'error' => $th
+    //   ]);
 
-      if (isset($data['prompts'])) {
-        foreach ($data['prompts'] as $prompt) {
-          $inputTokens += $this->estimateTokens($prompt);
-        }
-      }
-
-      if (isset($data['completions'])) {
-        foreach ($data['completions'] as $completion) {
-          $outputTokens += strlen($completion);
-        }
-      }
-
-      $inputTokens = intval($inputTokens);
-      $outputTokens = intval($outputTokens / 4);
-
-      return [
-        'prompt_tokens' => $inputTokens,
-        'completion_tokens' => $outputTokens,
-        'total_tokens' => $inputTokens + $outputTokens,
-      ];
-    }
+    //   return $this->estimatePrice($data);
+    // }
   }
 
   public function estimateTokens(array $message)
@@ -266,23 +271,8 @@ class Chat
 
   public function summary(array $messages)
   {
-    try {
-      $tokens = aimuse()->api()->summary([
-        'tokenizer' => 'gpt',
-        'messages' => $messages
-      ]);
-
-      foreach ($messages as $key => &$message) {
-        $message['tokens'] = $tokens[$key];
-      }
-    } catch (\Throwable $th) {
-      Log::error('OpenAI token summary error', [
-        'error' => $th
-      ]);
-
-      foreach ($messages as &$message) {
-        $message['tokens'] = $this->estimateTokens($message);
-      }
+    foreach ($messages as &$message) {
+      $message['tokens'] = $this->estimateTokens($message);
     }
 
     return $messages;

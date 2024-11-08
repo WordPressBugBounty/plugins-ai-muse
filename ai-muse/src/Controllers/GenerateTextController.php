@@ -6,10 +6,11 @@ use WP_REST_Response;
 use AIMuse\Models\Settings;
 use AIMuse\Models\Template;
 use AIMuse\Attributes\Route;
-use AIMuse\Attributes\GenerateTextOptions;
+use AIMuse\Data\GenerateTextOptions;
 use AIMuse\Exceptions\ApiKeyNotSetException;
 use AIMuse\Exceptions\ControllerException;
 use AIMuse\Exceptions\GenerateException;
+use AIMuse\Helpers\PostHelper;
 use AIMuse\Helpers\PremiumHelper;
 use AIMuse\Helpers\PromptHelper;
 use AIMuse\Validators\Validator;
@@ -40,6 +41,16 @@ class GenerateTextController extends Controller
       throw new ControllerException(Validator::toArray($violations), 400);
     }
 
+    if ($request->json('isRetry')) {
+      ResponseHelper::prepare([
+        'channel' => $request->json('channel'),
+      ]);
+
+      ResponseHelper::setTimeout($request->timeout);
+      ResponseHelper::initCache();
+      ResponseHelper::serveCache();
+    }
+
     $systemPrompt = '';
 
     if (!$request->withoutSystemPrompt) {
@@ -51,17 +62,9 @@ class GenerateTextController extends Controller
 
       $systemPrompts = Template::query()->whereIn('slug', $systemPromptSlugs);
       $systemPrompt = $systemPrompts->pluck('prompt')->implode("\n");
-
-      try {
-        $systemPrompt = PromptHelper::replaceSiteVariables($systemPrompt);
-      } catch (\Throwable $th) {
-        throw new ControllerException([
-          [
-            'message' => 'An error occured when replacing site variables'
-          ]
-        ], 500);
-      }
     }
+
+    $systemPrompt = $request->json('systemPrompt') ?? $systemPrompt;
 
     $request->templates = collect($request->templates);
     $slugs = $request->templates->pluck('slug')->toArray();
@@ -79,88 +82,6 @@ class GenerateTextController extends Controller
       $prompts[] = str_replace('{{option}}', $option, $prompt);
     }
 
-    if (count($prompts) == 0) {
-      throw new ControllerException([
-        [
-          'message' => 'Templates or prompt must be provided'
-        ]
-      ], 400);
-    }
-
-    $userPrompt = implode("\n", $prompts);
-    $userPrompt = str_replace('{{text}}', $request->text, $userPrompt);
-
-    if ($request->post) {
-      try {
-        $userPrompt = PromptHelper::replaceVariables($userPrompt, $request->post);
-      } catch (\Throwable $th) {
-        throw new ControllerException([
-          [
-            'message' => 'An error occured when replacing variables in user prompt'
-          ]
-        ], 500);
-      }
-    }
-
-    $model = AIModel::getByRequest($request, 'textModel');
-
-    if (!PremiumHelper::isPremium()) {
-      $premiumServices = [
-        'googleai',
-        'openrouter',
-      ];
-
-      if (in_array($model->service, $premiumServices)) {
-        throw new ControllerException([
-          [
-            'message' => "You need to upgrade to premium to use {$model->service} service"
-          ]
-        ], 400);
-      }
-    }
-
-    if (!isset(AIModel::$keyNames[$model->service])) {
-      throw new ControllerException([
-        [
-          'message' => "Text model service {$model->service} is not supported"
-        ]
-      ], 400);
-    }
-
-    $apiKey = Settings::get(AIModel::$keyNames[$model->service]);
-
-    if (!$apiKey) {
-      throw new ApiKeyNotSetException("Your text model is {$model->service}@{$model->name} but {$model->service} API key is not set");
-    }
-
-    ResponseHelper::setMode('sse');
-    ResponseHelper::prepareSSE();
-
-    $isStreamAvailable = Settings::get('isStreamAvailable', null);
-
-    if (!function_exists('openssl_encrypt')) {
-      $isStreamAvailable = true;
-    }
-
-    if (!$isStreamAvailable) {
-      try {
-        $websocket = aimuse()->api()->stream();
-        ResponseHelper::prepareWebsocket($websocket, $request->json('channel'));
-        ResponseHelper::setMode('websocket');
-        ResponseHelper::setSecretKey($request->secret);
-      } catch (\Throwable $th) {
-        Log::error('An error occured when connect to AI Muse stream server', [
-          'error' => $th,
-          'trace' => $th->getTrace(),
-        ]);
-      }
-    }
-
-    $callback = function ($event, $data) {
-      return ResponseHelper::send($event, $data);
-    };
-
-    $messages = [];
     $datasetSlugs = [];
 
     if ($request->json('dataset')) {
@@ -177,33 +98,100 @@ class GenerateTextController extends Controller
     }
 
     if (count($datasetSlugs) > 0) {
-      $datasets = Dataset::with('conversations')->whereIn('slug', $datasetSlugs)->get();
-
+      $prompts[] = 'Datasets';
+      $prompts[] = '=====================';
+      $datasets = Dataset::query()->whereIn('slug', $datasetSlugs)->get();
       foreach ($datasets as $dataset) {
-        foreach ($dataset->conversations as $conversation) {
-          $messages[] = [
-            'content' => $conversation->prompt,
-            'role' => 'user',
-          ];
-
-          $messages[] = [
-            'content' => $conversation->response,
-            'role' => 'model',
-          ];
-        }
+        $prompts[] = $dataset->name;
+        $prompts[] = "{{dataset:{$dataset->id}}}";
       }
     }
 
-    $messages = array_merge($messages, $request->messages ?? []);
+    if (!count($prompts) && !count($request->messages)) {
+      throw new ControllerException([
+        [
+          'message' => 'Templates or prompt must be provided'
+        ]
+      ], 400);
+    }
+
+    $userPrompt = implode("\n", $prompts);
+    $userPrompt = str_replace('{{text}}', $request->text, $userPrompt);
+
+    if ($request->json('post')) {
+      PostHelper::overrideID($request->json('post'));
+    } elseif ($request->json('url')) {
+      PostHelper::overrideURL($request->json('url'));
+    }
+
+    try {
+      $userPrompt = PromptHelper::replaceAllVariables($userPrompt);
+    } catch (\Throwable $th) {
+      Log::error('An error occured when replacing variables in user prompt', [
+        'error' => $th->getMessage(),
+        'trace' => $th->getTraceAsString(),
+        'request' => $request->id,
+      ]);
+
+      throw ControllerException::make('An error occured when replacing variables in user prompt', 500);
+    }
+
+    if ($systemPrompt) {
+      try {
+        $systemPrompt = PromptHelper::replaceAllVariables($systemPrompt);
+      } catch (\Throwable $th) {
+        Log::error('An error occured when replacing variables in system prompt', [
+          'error' => $th->getMessage(),
+          'trace' => $th->getTraceAsString(),
+          'request' => $request->id,
+        ]);
+
+        throw ControllerException::make('An error occured when replacing variables in system prompt', 500);
+      }
+    }
+
+    $model = AIModel::getByRequest($request, 'textModel');
+
+    PremiumHelper::validateModel($model);
+
+    if (!isset(AIModel::$keyNames[$model->service])) {
+      throw new ControllerException([
+        [
+          'message' => "Text model service {$model->service} is not supported"
+        ]
+      ], 400);
+    }
+
+    $apiKey = Settings::get(AIModel::$keyNames[$model->service]);
+
+    if (!$apiKey) {
+      throw new ApiKeyNotSetException("Your text model is {$model->service}@{$model->name} but {$model->service} API key is not set");
+    }
+
+    if (!$request->json('disableStream')) {
+      ResponseHelper::prepare([
+        'forceSSE' => $request->json('forceSSE'),
+        'secret' => $request->json('secret'),
+        'channel' => $request->json('channel'),
+      ]);
+    }
+
+    $callback = function ($event, $data) {
+      Log::debug('Generate text callback', [
+        'event' => $event,
+        'data' => $data,
+      ]);
+      return ResponseHelper::send($event, $data);
+    };
 
     $options = new GenerateTextOptions([
       'systemPrompt' => $systemPrompt,
       'userPrompt' => $userPrompt,
       'model' => $model,
       'component' => $request->component,
-      'callback' => $callback,
+      'callback' => $request->json('callback') ?? $callback,
       'session' => $request->session ?? "",
-      'messages' => $messages,
+      'messages' => $request->messages ?? [],
       'contextLength' => $request->contextLength ?? 0,
     ]);
 
@@ -211,6 +199,10 @@ class GenerateTextController extends Controller
       ResponseHelper::release();
       return new WP_REST_Response($options);
     }
+
+    Log::debug('Generate text options', [
+      'options' => $options,
+    ]);
 
     // We need to set the time limit to 0 to prevent the script from timing out when the stream is running
     set_time_limit(0);

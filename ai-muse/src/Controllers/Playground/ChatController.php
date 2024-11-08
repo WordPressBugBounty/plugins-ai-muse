@@ -16,6 +16,7 @@ use AIMuse\Models\PlaygroundChat;
 use AIMuse\Validators\Playground\CreateChatValidator;
 use AIMuse\Validators\Playground\SearchChatValidator;
 use AIMuse\Validators\Playground\UpdateChatValidator;
+use AIMuseVendor\Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
@@ -35,6 +36,10 @@ class ChatController extends Controller
     }
 
     $user = User::query()->find(wp_get_current_user()->ID);
+
+    Log::debug('Creating playground chat', [
+      'request' => $request->all(),
+    ]);
 
     /**
      * @var PlaygroundChat $created

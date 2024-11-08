@@ -3,7 +3,7 @@
 namespace AIMuse;
 
 use AIMuse\Exceptions\HookException;
-use AIMuse\Wordpress\Hooks\Hook;
+use AIMuse\WordPress\Hooks\Hook;
 
 class Hooks
 {
@@ -11,7 +11,7 @@ class Hooks
   {
     $hooks = [];
 
-    $directory = new \RecursiveDirectoryIterator(aimuse()->dir() . 'src/Wordpress/Hooks');
+    $directory = new \RecursiveDirectoryIterator(aimuse()->dir() . 'src/WordPress/Hooks');
     $iterator = new \RecursiveIteratorIterator($directory);
 
     /**

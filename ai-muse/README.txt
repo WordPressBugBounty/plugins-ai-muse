@@ -1,12 +1,10 @@
-
-
-=== AI Muse - AI Content Generator & Writer, AI Image Generator, AI Assistant, ChatGPT, GPT-4o, Gemini, LLAMA, Mistral, Claude ===
+=== AI Muse – AI Chatbot, AI Content Generator & Writer, AI Image Generator, AI Assistant, ChatGPT, GPT-4o, Gemini, LLAMA, Claude ===
 Contributors: wpaimuse
-Tags: ai, content, gpt, seo, assistant
-Requires at least: 6.3
+Tags: ai, gpt, seo, assistant, chatbot
+Requires at least: 6.1
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 1.2.3
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,7 +12,7 @@ AI Content Generation with over 100+ models from OpenAI (ChatGPT), Google (Gemin
 
 == Description ==
 
-Introducing [AI Muse](https://wpaimuse.com/ "AI Muse") the Ultimate AI Content Generator for WordPress, a cutting-edge plugin designed to revolutionize the way you create content on your WordPress sites. 
+Introducing [AI Muse](https://wpaimuse.com/ "AI Muse");
 
 Supporting over 100+ AI models from OpenAI, Google AI, and OpenRouter, this powerful tool brings the future of automated content generation directly into your WordPress Block Editor or Site Editor. 
 
@@ -46,6 +44,23 @@ Dedicated [AI Content Generation](https://wpaimuse.com/docs/features/content-gen
 ## Bulk Content Generation
 With AI Content Generator feature you can use Bulk Content Generation and Publish or Draft multiple Posts or Post Types.
 
+## AI Chatbot
+With the AI Muse Chatbot, you can create any type of chatbot you need. It can serve as a sales assistant to collect leads, a support assistant to answer frequently asked questions, or even a dynamic assistant that reads the current page on your website and responds based on its content.
+
+- Global Chatbot for the Website
+- Multiple Chatbots with Shortcode
+- Custom Chatbot Icon and Logo
+- Custom Chatbot Colors
+- Custom Chatbot Sizes
+- Custom Chatbot Position
+- Custom Chatbot Background Color and Image
+- Form Feature to Collect Name and Email
+- Translation Ready (WPML Tested)
+- Email Notifications for Chatbot Logs
+- Custom Model Settings
+- Custom Variables for Dynamic Content
+- Advanced Custom CSS
+- Advanced Custom Shortcode Support
 
 ## AI Image Generator
 AI Muse uses AI to create stunning visuals that match your ideas or directly complement your content. It's like having your own AI image designer. [AI Image Generator](https://wpaimuse.com/docs/features/image-generator/ "AI Image Generator")
@@ -123,6 +138,35 @@ Join our AI Muse community at [community.wpaimuse.com](https://community.wpaimus
 
 
 == Changelog ==
+= [1.3.0] - 2024-11-08 =
+* Feature: AI Chatbot
+* Feature: Global Chatbot for the Website
+* Feature: Multiple Chatbots with Shortcode
+* Feature: Custom Chatbot Icon and Logo
+* Feature: Custom Chatbot Colors
+* Feature: Custom Chatbot Sizes
+* Feature: Custom Chatbot Position
+* Feature: Custom Chatbot Background Color and Image
+* Feature: Form Feature to Collect Name and Email
+* Feature: Translation Ready (WPML Tested)
+* Feature: Email Notifications for Chatbot Logs
+* Feature: Custom Model Settings
+* Feature: Custom Variables for Dynamic Content
+* Feature: Advanced Custom CSS
+* Feature: Advanced Custom Shortcode Support
+* Feature: Added new prompt variable `{{taxonomy:NAME}}` to embed taxonomy terms in the prompt.
+* Fixed: Conflicts with some plugins have been solved.
+* Feature: Fine-tuning model trainer feature added.
+* Feature: Added prompt improvement capability for image generator.
+* Feature: Added the ability to add custom models.
+* Improvement: Prompt template restore default button added.
+* Improvement: Added enter hotkey to prompt input to select the first variable found.
+* Feature: Added new prompt variable `{{custom_field:NAME}}` to embed custom fields in the prompt.
+* Improvement: Added selection to show tokens and price data in Dashboard.
+* Improvement: Bulk delete feature has been added to Dataset table.
+* Improvement: Google AI and OpenRouter models are now also available for free members.
+* Fixed: The context length issue in OpenRouter models has been resolved.
+* Feature: Added new prompt variable `{{shortcode:[some_shortcode]}}` to embed shortcodes in the prompt.
 
 = [1.2.2] - 2024-06-12 =
 * Fixed: The issue of saving as markdown in the bulk content suggestion tool has been resolved.

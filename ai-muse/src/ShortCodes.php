@@ -2,7 +2,7 @@
 
 namespace AIMuse;
 
-use AIMuse\Wordpress\ShortCodes\ShortCode;
+use AIMuse\WordPress\ShortCodes\ShortCode;
 use AIMuse\Exceptions\ShortCodeException;
 
 class ShortCodes
@@ -11,7 +11,7 @@ class ShortCodes
   {
     $shortCodes = [];
 
-    $directory = new \RecursiveDirectoryIterator(aimuse()->dir() . 'src/Wordpress/ShortCodes');
+    $directory = new \RecursiveDirectoryIterator(aimuse()->dir() . 'src/WordPress/ShortCodes');
     $iterator = new \RecursiveIteratorIterator($directory);
 
     /**

@@ -138,7 +138,7 @@ msgstr ""
 
 #: includes/class-freemius.php:4769, includes/class-freemius.php:21125, includes/class-freemius.php:24783
 msgctxt "interjection expressing joy or exuberance"
-msgid "Yee-haw"
+msgid "Congratulations"
 msgstr ""
 
 #: includes/class-freemius.php:4783

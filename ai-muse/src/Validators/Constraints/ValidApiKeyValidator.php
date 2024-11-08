@@ -12,6 +12,13 @@ use AIMuseVendor\Symfony\Component\Validator\ConstraintValidator;
 
 class ValidApiKeyValidator extends ConstraintValidator
 {
+  /**
+   * Validate the value of the constraint
+   *
+   * @param string $value
+   * @param ValidApiKey $constraint
+   * @return bool
+   */
   public function validate($value, Constraint $constraint)
   {
     if ($value == '') {

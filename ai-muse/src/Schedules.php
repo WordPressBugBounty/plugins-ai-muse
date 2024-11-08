@@ -3,7 +3,7 @@
 namespace AIMuse;
 
 use AIMuse\Exceptions\ScheduleException;
-use AIMuse\Wordpress\Schedules\Schedule;
+use AIMuse\WordPress\Schedules\Schedule;
 
 class Schedules
 {
@@ -43,7 +43,7 @@ class Schedules
   {
     $schedules = [];
 
-    $directory = new \RecursiveDirectoryIterator(aimuse()->dir() . 'src/Wordpress/Schedules');
+    $directory = new \RecursiveDirectoryIterator(aimuse()->dir() . 'src/WordPress/Schedules');
     $iterator = new \RecursiveIteratorIterator($directory);
 
     /**

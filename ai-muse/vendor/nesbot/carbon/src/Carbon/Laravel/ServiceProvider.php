@@ -16,7 +16,7 @@ use AIMuseVendor\Carbon\CarbonImmutable;
 use AIMuseVendor\Carbon\CarbonInterval;
 use AIMuseVendor\Carbon\CarbonPeriod;
 use AIMuseVendor\Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
-use Illuminate\Events\Dispatcher;
+use AIMuseVendor\Illuminate\Events\Dispatcher;
 use Illuminate\Events\EventDispatcher;
 use AIMuseVendor\Illuminate\Support\Carbon as IlluminateCarbon;
 use AIMuseVendor\Illuminate\Support\Facades\Date;

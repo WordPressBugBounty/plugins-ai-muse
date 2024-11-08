@@ -2,24 +2,60 @@
 
 namespace AIMuse\Helpers;
 
+use AIMuse\Models\Settings;
 use WP_REST_Response;
-use AIMuse\Services\Api\Stream;
+use AIMuseVendor\Illuminate\Support\Facades\File;
+use AIMuseVendor\Illuminate\Support\Facades\Log;
 
 class ResponseHelper
 {
-  public static Stream $websocket;
   public static string $channel;
   public static string $mode = 'sse';
-  private static string $secretKey = '';
+  public static bool $isStreamAvailable = false;
+  public static string $data = '';
+  public static string $cacheDir = WP_CONTENT_DIR . '/uploads/aimuse/generate';
+  public static string $cacheFile = '';
+  public static int $timeout = 60;
+
+  public static function prepare(array $options)
+  {
+    static::$isStreamAvailable = $options['forceSSE'] || Settings::get('isStreamAvailable', null);
+    static::$channel = $options['channel'];
+    static::$cacheFile = static::$cacheDir . '/' . static::$channel;
+
+    static::prepareSSE();
+
+    if (static::$isStreamAvailable) {
+      static::setMode('sse');
+    } else {
+      static::setMode('response');
+    }
+  }
+
+  public static function setTimeout(int $timeout)
+  {
+    static::$timeout = $timeout;
+  }
 
   public static function prepareSSE()
   {
-    ignore_user_abort(true);
     ob_start();
+    ignore_user_abort(true);
     header('Content-Type: text/event-stream');
     header('Cache-Control: no-cache');
+    header('Connection: keep-alive');
+    // Disable output buffering
     header('X-Accel-Buffering: no');
+
+    ini_set('output_buffering', 'off');
+    ini_set('zlib.output_compression', false);
+    ini_set('implicit_flush', true);
+
     ob_implicit_flush(true);
+
+    while (ob_get_level() > 0) {
+      ob_end_flush();
+    }
   }
 
   public static function sendSSE($event, $data)
@@ -32,39 +68,10 @@ class ResponseHelper
     flush();
   }
 
-  public static function setSecretKey(string $secretKey)
-  {
-    if (strlen($secretKey) != 16) {
-      throw new \Exception('Secret key must be 16 characters long');
-    }
-
-    self::$secretKey = $secretKey;
-  }
-
   public static function release()
   {
     @ob_end_flush();
     header('Content-Type: application/json');
-  }
-
-  public static function sendWebsocket(string $event, $data)
-  {
-    if (is_array($data)) {
-      $data = wp_json_encode($data);
-    }
-
-    $data = openssl_encrypt($data, 'aes-128-cbc', self::$secretKey, 0, self::$secretKey);
-
-    return self::$websocket->publish(self::$channel, [
-      'type' => $event,
-      'data' => $data
-    ]);
-  }
-
-  public static function prepareWebsocket(Stream $websocket, string $channel)
-  {
-    self::$websocket = $websocket;
-    self::$channel = $channel;
   }
 
   public static function setMode(string $mode)
@@ -75,36 +82,96 @@ class ResponseHelper
   public static function send($event, $data)
   {
     $action = 'continue';
-    self::sendSSE($event, $data);
+
 
     if (self::$mode == 'sse') {
+      self::sendSSE($event, $data);
       if (connection_aborted()) {
-        // $action = 'stop';
-      }
-    }
-
-    if (self::$mode == 'websocket') {
-      $response = self::sendWebsocket($event, $data);
-      if ($response->code != 200) {
         $action = 'stop';
       }
     }
 
+    if (self::$mode == 'response') {
+      static::$data .= "event: " . esc_html($event) . "\n";
+      static::$data .= 'data: ' . wp_json_encode(['message' => $data]) . "\n\n";
+    }
+
     if ($event == 'done') {
+      self::dump();
+      self::putCache();
       self::exit();
     }
 
     return $action;
   }
 
-  public static function exit()
+  public static function setChannel(string $channel)
   {
-    if (self::$mode == 'websocket') {
-      self::$websocket->close();
+    self::$channel = $channel;
+  }
+
+  public static function putCache()
+  {
+    if (!static::$cacheFile) return;
+    if (!File::exists(static::$cacheFile)) return;
+
+    File::put(static::$cacheFile, static::$data);
+  }
+
+  public static function initCache()
+  {
+    if (File::exists(static::$cacheFile)) return;
+
+    if (!File::exists(static::$cacheDir)) {
+      File::makeDirectory(static::$cacheDir, 0755, true);
     }
 
-    ob_end_flush();
+    File::put(static::$cacheFile, '');
+  }
 
+  public static function readCache()
+  {
+    return File::get(static::$cacheFile);
+  }
+
+  public static function clearCache()
+  {
+    if (File::exists(static::$cacheFile)) {
+      File::delete(static::$cacheFile);
+    }
+  }
+
+  public static function serveCache()
+  {
+    Log::debug('Serving cache', [
+      'channel' => static::$channel,
+      'file' => static::$cacheFile,
+    ]);
+
+    for ($i = 0; $i < self::$timeout; $i++) {
+      self::$data = self::readCache();
+      if (self::$data) {
+        self::dump();
+        self::clearCache();
+        self::exit();
+      }
+      sleep(1);
+    }
+
+    http_response_code(204);
+    self::exit();
+  }
+
+  public static function dump()
+  {
+    if (self::$mode == 'response') {
+      echo static::$data;
+    }
+  }
+
+  public static function exit()
+  {
+    ob_end_flush();
     exit();
   }
 
