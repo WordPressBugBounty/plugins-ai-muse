@@ -8,6 +8,7 @@ use AIMuse\Attributes\Route;
 use AIMuse\Exceptions\ControllerException;
 use AIMuse\Helpers\PremiumHelper;
 use AIMuse\Middleware\AdminAuth;
+use AIMuse\Models\AIModel;
 use AIMuse\Validators\Validator;
 use AIMuseVendor\Illuminate\Support\Facades\DB;
 use AIMuse\Validators\HistoryValidator;

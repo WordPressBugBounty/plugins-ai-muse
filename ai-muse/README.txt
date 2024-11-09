@@ -4,7 +4,7 @@ Tags: ai, gpt, seo, assistant, chatbot
 Requires at least: 6.1
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,14 +130,21 @@ Join our AI Muse community at [community.wpaimuse.com](https://community.wpaimus
 
 
 == Screenshots ==
-1. AI Assistant Block for Block Editor
-2. AI Muse Content Generator with AI
-3. AI Muse Image Generator with AI
+1. AI Muse Chatbot
+2. AI Muse Fine-tuning Datasets
+3. AI Muse Fine-tuning Dataset Generator
 4. AI Muse Prompt Templates
-5. AI Muse Advanced Dashboard Statistics
+5. AI Muse Image Generator
+6. AI Muse Content Generator
+7. AI Muse Playground
+8. AI Muse Block for Block Editor
+9. AI Muse Advanced Dashboard Statistics
 
 
 == Changelog ==
+= [1.3.1] - 2024-11-09 =
+* Fixed: The problem that the model information of the images produced on the Image Generator page does not appear has been fixed.
+
 = [1.3.0] - 2024-11-08 =
 * Feature: AI Chatbot
 * Feature: Global Chatbot for the Website
