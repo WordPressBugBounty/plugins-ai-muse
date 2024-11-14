@@ -2,9 +2,9 @@
 Contributors: wpaimuse
 Tags: ai, gpt, seo, assistant, chatbot
 Requires at least: 6.1
-Tested up to: 6.5
+Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -142,6 +142,10 @@ Join our AI Muse community at [community.wpaimuse.com](https://community.wpaimus
 
 
 == Changelog ==
+= [1.3.2] - 2024-11-14 =
+* Fixed: Fixed an error when saving system prompts.
+* Improvement: Error messages have been updated on the edit system prompts screen.
+
 = [1.3.1] - 2024-11-09 =
 * Fixed: The problem that the model information of the images produced on the Image Generator page does not appear has been fixed.
 

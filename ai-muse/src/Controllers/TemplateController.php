@@ -124,7 +124,7 @@ class TemplateController extends Controller
       ], 400);
     }
 
-    $template = Template::query()->find($request->id);
+    $template = Template::query()->where('slug', $request->slug)->orWhere('id', $request->id)->first();
 
     if (!$template) {
       throw new ControllerException([
