@@ -6,7 +6,7 @@
 		}
 
 		.proton-table tr.title td {
-			padding: 25px 35px;
+			padding: 15px 25px;
 		}
 
 		.proton-table tr.title h3 {

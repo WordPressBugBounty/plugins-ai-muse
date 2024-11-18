@@ -4,17 +4,19 @@ Tags: ai, gpt, seo, assistant, chatbot
 Requires at least: 6.1
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-AI Content Generation with over 100+ models from OpenAI (ChatGPT), Google (Gemini) AI and OpenRouter. Generate AI Content and AI Images with AI Muse.
+AI Chatbot and AI Content Generation with over 300+ models from OpenAI (ChatGPT), Google AI and OpenRouter. Generate contents and images with AI Muse.
 
 == Description ==
 
 Introducing [AI Muse](https://wpaimuse.com/ "AI Muse");
 
-Supporting over 100+ AI models from OpenAI, Google AI, and OpenRouter, this powerful tool brings the future of automated content generation directly into your WordPress Block Editor or Site Editor. 
+AI Chatbot and AI Content Generation with over 300+ models from OpenAI (ChatGPT), Google AI and OpenRouter. Generate contents and images with AI Muse.
+
+Supporting over 300+ AI models from OpenAI, Google AI, and OpenRouter, this powerful tool brings the future of automated content generation directly into your WordPress Block Editor or Site Editor. 
 
 Personalize your AIMuse with Custom Prompts and Prompt Templates features for your unique needs.
 
@@ -34,16 +36,7 @@ Join AI Muse Community: Get support, submit new features, report bugs and connec
 
 ------------
 
-
 **Core Features**
-## AI Content Generator
-[youtube https://www.youtube.com/watch?v=MQxyJoGjIP0]
-Dedicated [AI Content Generation](https://wpaimuse.com/docs/features/content-generator/ "AI Content Generation") editor for creating new topics, drafting posts, and filling in your post types. Works seamlessly with native WordPress post fields and post types. 
-
-
-## Bulk Content Generation
-With AI Content Generator feature you can use Bulk Content Generation and Publish or Draft multiple Posts or Post Types.
-
 ## AI Chatbot
 With the AI Muse Chatbot, you can create any type of chatbot you need. It can serve as a sales assistant to collect leads, a support assistant to answer frequently asked questions, or even a dynamic assistant that reads the current page on your website and responds based on its content.
 
@@ -61,6 +54,13 @@ With the AI Muse Chatbot, you can create any type of chatbot you need. It can se
 - Custom Variables for Dynamic Content
 - Advanced Custom CSS
 - Advanced Custom Shortcode Support
+
+## AI Content Generator
+[youtube https://www.youtube.com/watch?v=MQxyJoGjIP0]
+Dedicated [AI Content Generation](https://wpaimuse.com/docs/features/content-generator/ "AI Content Generation") editor for creating new topics, drafting posts, and filling in your post types. Works seamlessly with native WordPress post fields and post types. 
+
+## Bulk Content Generation
+With AI Content Generator feature you can use Bulk Content Generation and Publish or Draft multiple Posts or Post Types.
 
 ## AI Image Generator
 AI Muse uses AI to create stunning visuals that match your ideas or directly complement your content. It's like having your own AI image designer. [AI Image Generator](https://wpaimuse.com/docs/features/image-generator/ "AI Image Generator")
@@ -142,6 +142,9 @@ Join our AI Muse community at [community.wpaimuse.com](https://community.wpaimus
 
 
 == Changelog ==
+= [1.3.3] - 2024-11-18 =
+* Improvement: Chatbot notification email reply-to address added.
+
 = [1.3.2] - 2024-11-14 =
 * Fixed: Fixed an error when saving system prompts.
 * Improvement: Error messages have been updated on the edit system prompts screen.

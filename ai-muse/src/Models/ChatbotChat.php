@@ -82,12 +82,14 @@ class ChatbotChat extends Model
     $html = aimuse()->view()->make('email.chatbot-chat', [
       'title' => "Chat#{$this->id} with {$visitor->name}",
       'messages' => $messages,
+      'visitor' => $visitor,
+      'bot' => $this->chatbot->name ?? 'Chatbot',
     ])->render();
 
     $subject = "Chatbot Chat#{$this->id} with {$visitor->name}";
     $success = EmailHelper::send($admin_email, $subject, $html, [
       'Content-Type: text/html; charset=UTF-8',
-      "Reply-To: {$visitor->email}"
+      "Reply-To: {$visitor->email}",
     ]);
 
     if (!$success) {
