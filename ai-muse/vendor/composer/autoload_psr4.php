@@ -37,7 +37,7 @@ return array(
     'AIMuseVendor\\League\\Config\\' => array($vendorDir . '/league/config/src'),
     'AIMuseVendor\\League\\CommonMark\\' => array($vendorDir . '/league/commonmark/src'),
     'AIMuseVendor\\Illuminate\\View\\' => array($vendorDir . '/illuminate/view'),
-    'AIMuseVendor\\Illuminate\\Support\\' => array($vendorDir . '/illuminate/macroable', $vendorDir . '/illuminate/collections', $vendorDir . '/illuminate/support'),
+    'AIMuseVendor\\Illuminate\\Support\\' => array($vendorDir . '/illuminate/macroable', $vendorDir . '/illuminate/support', $vendorDir . '/illuminate/collections'),
     'AIMuseVendor\\Illuminate\\Pipeline\\' => array($vendorDir . '/illuminate/pipeline'),
     'AIMuseVendor\\Illuminate\\Log\\' => array($vendorDir . '/illuminate/log'),
     'AIMuseVendor\\Illuminate\\Filesystem\\' => array($vendorDir . '/illuminate/filesystem'),

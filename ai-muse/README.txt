@@ -4,7 +4,7 @@ Tags: ai, gpt, seo, assistant, chatbot
 Requires at least: 6.1
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.3
+Stable tag: 1.3.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -142,6 +142,11 @@ Join our AI Muse community at [community.wpaimuse.com](https://community.wpaimus
 
 
 == Changelog ==
+= [1.3.4] - 2024-11-20 =
+* Improvement: UI performance improvements.
+* Improvement: Added o1-mini and o1-preview models to OpenAI models.
+* Fixed: Fixed system prompt error in OpenAI o1 models.
+
 = [1.3.3] - 2024-11-18 =
 * Improvement: Chatbot notification email reply-to address added.
 

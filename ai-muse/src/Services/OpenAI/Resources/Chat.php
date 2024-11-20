@@ -99,9 +99,16 @@ class Chat
       $options->messages = [];
     }
 
+    // TODO: This is a temporary fix for the system role issue for o1 models
+    $systemRole = 'system';
+
+    if (str_starts_with($options->model->name, 'o1')) {
+      $systemRole = 'user';
+    }
+
     if ($options->systemPrompt) {
       array_unshift($options->messages, [
-        'role' => 'system',
+        'role' => $systemRole,
         'content' => $options->systemPrompt
       ]);
     }

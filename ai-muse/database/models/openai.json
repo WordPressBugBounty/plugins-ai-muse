@@ -445,5 +445,77 @@
       }
     },
     "created": 1696153670
+  },
+  {
+    "name": "o1-mini-2024-09-12",
+    "service": "openai",
+    "type": "text",
+    "meta": {
+      "defaults": {
+        "contextLength": 128000,
+        "maxTokens": 65536
+      },
+      "pricing": {
+        "text": {
+          "input": 0.000003,
+          "output": 0.000012
+        }
+      }
+    },
+    "created": 1726099200
+  },
+  {
+    "name": "o1-mini",
+    "service": "openai",
+    "type": "text",
+    "meta": {
+      "defaults": {
+        "contextLength": 128000,
+        "maxTokens": 65536
+      },
+      "pricing": {
+        "text": {
+          "input": 0.000003,
+          "output": 0.000012
+        }
+      }
+    },
+    "created": 1726099200
+  },
+  {
+    "name": "o1-preview-2024-09-12",
+    "service": "openai",
+    "type": "text",
+    "meta": {
+      "defaults": {
+        "contextLength": 128000,
+        "maxTokens": 32768
+      },
+      "pricing": {
+        "text": {
+          "input": 0.000015,
+          "output": 0.00006
+        }
+      }
+    },
+    "created": 1726099200
+  },
+  {
+    "name": "o1-preview",
+    "service": "openai",
+    "type": "text",
+    "meta": {
+      "defaults": {
+        "contextLength": 128000,
+        "maxTokens": 32768
+      },
+      "pricing": {
+        "text": {
+          "input": 0.000015,
+          "output": 0.00006
+        }
+      }
+    },
+    "created": 1726099200
   }
 ]
